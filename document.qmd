@@ -1,70 +1,255 @@
 ---
-title: "Quarto Basics"
+title: "Counter Strike 2"
+subtitle: "A simple Analysis of Esports Data"
+author: "Alvaro Cervan"
+subject: "Sports Data Analysis"
+date: last-modified
+title-block-banner: orange
+title-block-banner-color: black
 toc: true
+toc-location: left
+number-sections: true
 format:
   html:
     code-fold: true
+    theme: darkly
 jupyter: python3
 ---
 
-For a demonstration of a line plot on a polar axis, see @fig-polar. Very nice indeed. sayonara
+## Introduction
 
-
-```{python}
-#| label: fig-polar
-#| fig-cap: "A line plot on a polar axis"
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-r = np.arange(0, 2, 0.01)
-theta = 2 * np.pi * r
-fig, ax = plt.subplots(
-  subplot_kw = {'projection': 'polar'} 
-)
-ax.plot(theta, r)
-ax.set_rticks([0.5, 1, 1.5, 2])
-ax.grid(True)
-plt.show()
-```
+This is a simple analysis of Counter Strike 2 data. The data was obtained from [Kaggle](https://www.kaggle.com/). The data includes information about weapons, players, maps, professional players, and professional games.
 
 ::: {.callout-note}
+In September 27, 2023 Counter Strike 2 (CS2) was released. The previous version, Counter Strike Global Offensive (CSGO), was released in August 21, 2012. They are essentially the same game, but CS2 has newer graphics and a few new features and improvements.
+:::
+
+### What is Counter Strike 2?
+
+![Counter Strike 2 logo](resources/csgo%20logo.jpg)
+
+<details>
+<summary>Display information about the game</summary>
+
+#### The Game 
+
+Counter-Strike 2 is a first-person shooter video game developed by Valve Corporation. It is the fourth game in the Counter-Strike series. 
+In 2012, with the release of Counter-Strike: Global Offensive, the game became hugely popular largely due to the **competitive mode** and the introduction of **skins (gambling related)**.
+
+The game pits two teams against each other: the **Terrorist (T)** against the **Counter Terrorist (CT)**. Each team has 5 players, with a total of 10 players in a match. At the start, the teams are given the roles of T or CT. In the round 13 this roles are swapped.
+
+#### The Rules
+
+A competitive match of CS2 is played in a maximum of 24 **rounds of 2 minutes**. 
+
+- **The winner:** First team to win 13 rounds wins the match.
+- **Tie:** It is possible to end the match in a Tie if both teams reach 12 rounds.
+- **Surrender:** If a team mate leaves of the match is very unequal and a team see that losing is unavoidable, they can vote to surrender to save time.
+
+#### The Round
+
+Each round is started in the same way. Both teams player's appear in their base, and have 15 seconds before they can move and start the round to prepare and choose their equipment.
+
+To win a round there are 2 possible ways:
+
+- Kill all (5) players on the other team.
+- **Terrorists:** Plant the bomb and explode it.
+- **Counter Terrorist:** Defuse the bomb after is set.
+
+#### Map
+
+Every map is designed in a similar way. The CT appear near the designated areas where the bomb must be planted. The T appears in the opposite end of the map. The maps then have different paths and features, but in general they have 3 main paths to reach the bomb site: A, B and Middle.
+
+- **A:** The path that leads to bomb site "A".
+- **B:** The path that leads to bomb site "B".
+- **Middle:** The path that leads to the middle of the map. It is usually more dangerous and leads between the two bomb sites.
+
+![Mirage Map with Callouts](resources/de_mirage-map-callouts.jpg){#fig-map}
+
+
+</details>
+
+### Why Counter Strike 2?
+
+<details>
+
+<summary> Why CS2 is different from other Esports </summary>
+
+Counter Strike 2 might look simple on a first impression, but under the hood, it is a very complex game, with a huge amount of systems to keep in mind that can tilt the game in favour of the most prepared team.
+
+#### Money
+
+Money is a key element of CS2, as it is used to buy weapons, armor, and grenades. Managing money is crucial to winning the game, as it can give a team a significant advantage over the other team. The amount of money a team has will determine what weapons they can buy, and how many grenades they can afford.
+
+At the beginning of each round, each team member is awarded an amount of money. The amount will differ depending on the outcome of the previous round. Furthermore, if a team wins a round, they will receive more money than the losing team, but to keep the game balanced, the losing team will receive a higher amount of money the more rounds they lose in a row.
+
+Also, bonus money is awarded for completing objectives, such as planting the bomb, defusing the bomb, or killing the enemy team.
+
+Killing an enemy player will also reward the player with money, but the amount will depend on the weapon used to kill the enemy.
+
+#### Weapons
+
+There are a variety of weapons in CS2, each with its own unique characteristics. Some weapons are more powerful than others, but they are also more expensive. The most powerful weapons are the AWP and the AK-47, but they are also the most expensive. The AWP is a one-shot kill weapon, while the AK-47 is a one-shot kill weapon to the head.
+
+Generally, the weapons can be divided into three categories: 
+
+| Category | Description                                                                 |
+|----------|-----------------------------------------------------------------------------|
+| Rifles   | Rifles are the most powerful weapons, but they are also the most expensive. |
+| SMGs     | SMGs are less powerful than rifles, but they are also less expensive.       |
+| Pistols  | Pistols are the least powerful weapons, but they are also the least expensive. |
+
+::: {.callout-note}
+As the CT team starts with the advantage of defending the bomb sites, they have more expensive weapons. The T team, on the other hand, has to attack the bomb sites, so they have cheaper weapons.
+:::
+
+#### Grenades and Armor
+
+##### Armor
+Armor is an essential part of CS2, as it can protect the player from damage. There are two types of armor in CS2:
+
+| Armor  | Description                                      |
+|--------|--------------------------------------------------|
+| Kevlar | Protects the player from damage to the body. Raises armor to 100     |
+| Helmet | Protects the player from damage to the head.      |
+
+Armor can be bought at the beginning of each round, and it will protect the player from damage until it is depleted. Once the armor is depleted, the player will take full damage from any subsequent hits.
+
+The helmet is an optional purchase after buying Kevlar. It is recommended to buy a helmet if the enemy team is using rifles, as it will protect the player from a one-shot kill to the head.
+
+##### Grenades
+Grenades are an essential part of CS2, as they can be used to control the map and force the enemy team to move. There are five types of grenades in CS2:
+
+| Grenade              | Description                                             |
+|----------------------|---------------------------------------------------------|
+| Flashbang            | A grenade that blinds the enemy team.                   |
+| Smoke                | A grenade that creates a smoke screen.                  |
+| HE                   | A grenade that deals damage to the enemy team.          |
+| Molotov / Incendiary | A grenade that creates a fire that deals damage to the enemy team. |
+| Decoy                | A grenade that creates a fake gunfire sound.            |
+
+#### Strategy
+
+CS2 is a game of strategy and teamwork. A team that works together and communicates effectively will have a significant advantage over a team that does not. There are many strategies that can be used in CS2, such as:
+
+| Strategy| Description|
+|---|-----------------|
+| Rushing                | A strategy where the team quickly moves to a bomb site to catch the enemy team off guard. |
+| Splitting              | A strategy where the team splits up and attacks multiple bomb sites at once. |
+| Holding                | A strategy where the team holds a position and waits for the enemy team to come to them. |
+| Faking                 | A strategy where the team pretends to attack one bomb site, but then switches to another bomb site at the last minute. |
+| Eco                    | A strategy where the team saves money by not buying weapons or armor, in order to buy more powerful weapons in future rounds. |
+| Force Buy              | A strategy where the team buys weapons and armor even if they do not have enough money, in order to try and win the round. |
+| Full Buy               | A strategy where the team buys the best weapons and armor they can afford, in order to have the best chance of winning the round. |
+| Save                   | A strategy where the team saves their weapons and armor in order to use them in future rounds. |
+| Retake                 | A strategy where the team waits for the enemy team to plant the bomb, and then tries to retake the bomb site. |
+| Default                | A strategy where the team spreads out across the map and waits for the enemy team to make a move. |
+
+
+#### Roles
+
+::: {.callout-note}
+This roles are not enforced, but they are a good way to understand the game and the different ways to play it. Even non professional players tend to follow this roles.
+:::
+
+In CS2, each player has a specific role to play. There are five main roles in CS2:
+
+- **Entry Fragger:** The player who goes in first and tries to get the first kill.
+- **Lurker:** The player who stays behind and tries to catch the enemy team off guard.
+- **AWPer:** The player who uses the AWP sniper rifle to get kills from long range.
+- **Support:** The player who helps the team by throwing grenades and providing cover fire.
+- **In-Game Leader:** The player who calls the shots and makes the decisions for the team.
+
+This roles are chosed individually by each player depending on their own skills and how they play best, and it is important for the team to work together and communicate effectively in order to win the game.
+
+#### Randomness
+
+CS2 is a game of skill, but there is also an element of randomness to it. The outcome of a round can be influenced by many factors, such as the weapons used, the map, the strategy, and the luck of the players. This randomness is what makes CS2 so exciting to watch and play, as it keeps the game fresh and unpredictable.
+
+Each round is virtually unique, completely different from the previous one, and the outcome is never certain. The tide of the game can turn in an instant, and a team that is losing can quickly turn the game around and win the match.
+
+No player faces the same situation twice, and each round is a new challenge that requires quick thinking, fast reflexes, and teamwork to overcome.
+
+#### Final Thoughts
+
+Adding the economic system, the weapons, the grenades, the armor, the maps, the strategies, the roles, and the randomness, CS2 is a complex game that requires a lot of skill and practice to master, but it is also a game that is incredibly rewarding and fun to play.
+
+The final touch is the competitive mode, where players can play against other players of similar skill level, and climb the ranks to become the best player in the world. This mode is what makes CS2 so popular, as it gives players a sense of accomplishment and progression, and keeps them coming back for more.
+While in other modes or other games, the player can play for fun but there is no real objective, in competitive mode the player has a goal, to win and climb the ranks, and this is what makes CS2 so addictive and engaging.
+
+</details>
+
+
+## Data 
+
+```{python libraries}
+# loading libraries to read csv files
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import plotly.express as px
+from itables import show
+
+```
+
+This is a preview of the datasets used in this analysis. 
+
+```{python}
+# loading the data
+weapons = pd.read_csv('data/weapons_statistics.csv')
+top_players = pd.read_csv('data/top_100_players.csv')
+maps = pd.read_csv('data/maps_statistics.csv')
+pro_players = pd.read_csv('data/csgo_professional_players.csv')
+pro_games = pd.read_csv('data/csgo_professional_games.csv')
+```
+
+::: {.panel-tabset}
+
+### Weapons
+
+```{python}
+# Show weapons table
+show(weapons)
+```
+
+### Players (Normal)
+
+```{python}
+# Show Top Normal Players table
+show(top_players)
+```
+
+### Maps
+
+```{python}
+# Show Maps table
+show(maps)
+```
+
+### Players (Pro)
+
+```{python}
+# Show Professional Players table
+show(pro_players)
+```
+
+### Pro Matches
+
+```{python}
+# Show Professional Matches table
+show(pro_games)
+```
+:::
+
+::: {.callout-note}
+### Anotation 2
 Note that there are five types of callouts, including:
 `note`, `warning`, `important`, `tip`, and `caution`.
-:::
-
-::: {.callout-tip}
-## Tip with Title
-
-This is an example of a callout with a title.
-:::
-
+```{markdown}
 ::: {.callout-caution collapse="true"}
 ## Expand To Learn About Collapse
 
 This is an example of a 'folded' caution callout that can be expanded by the user. You can use `collapse="true"` to collapse it by default or `collapse="false"` to make a collapsible callout that is expanded by default.
 :::
-
-::: {.callout-note appearance="default"}
-
-## Pay Attention
-
-Using callouts is an effective way to highlight content that your reader give special consideration or attention.
-
-:::
-
-::: {.callout-note appearance="simple"}
-
-## Pay Attention
-
-Using callouts is an effective way to highlight content that your reader give special consideration or attention.
-
-:::
-
-::: {.callout-note appearance="minimal"}
-
-## Pay Attention
-
-Using callouts is an effective way to highlight content that your reader give special consideration or attention.
-
+```
 :::
