@@ -1,0 +1,84 @@
+---
+title: "Journal of Counter Strike 2 Analysis"
+subtitle: "The Process"
+author: "Alvaro Cervan"
+subject: "Sports Data Analysis"
+date: last-modified
+title-block-banner: orange
+title-block-banner-color: black
+toc: true
+toc-location: left
+toc-depth: 4
+number-sections: true
+number-sections-depth: 3
+format:
+  pdf: default
+jupyter: python3
+---
+
+## Introduction
+
+The choice for this game comes as personal preference. I have been playing Counter Strike since I was a kid and I have always been interested in the competitive scene. When Global Offensive came out, I was already a fan of the game and a few friends and I started playing it. We started not being very good, but we got better and better, and reached some of the highest ranks in the game. 
+
+The game even requires a lot of strategy, team play and study of tactics,position and decision making. That meant that watching professional games, professional players and teams could help us improve our game. 
+
+::: {.callout-tip}
+### Grenades
+Smoke grenades are used to block vision and by watching tutorials and professional games, we could learn how to throw them to the sky and make them land in the right spot. Having this knowledge is a great advantage in the game.
+
+Before CS2 fixed this, there was a "bug" that allowed to achieve a "one way smoke" that allowed to see the enemy but not be seen.
+:::
+
+## Data
+
+Counter Strike produces a lot of data, some of it even shown in game, such as the damage done to the player who killed you, money spent each round, bullets shot, etc.
+
+The data is not recorded or transcript in a manual way, nor there is a specific signal or event that needs to be triggered to start recording. The data is always being recorded and can be accessed at any time. That is a big advantage for analysis in E-sports compared to traditional sports where different sensors need to be placed in the field and or players to record data.
+
+This data is not available to the public, but there are some websites that collect data from professional games and make it available to the public.
+
+### Data Choice
+
+The data used for this analysis comes from [Kaggle](https://www.kaggle.com) which is scraped from [HLTV](https://www.hltv.org).
+
+::: {.callout-note}
+The was available a script to scrape the data from HLTV, but the speed of the scraping was very slow to avoid being banned by the website. Hence, the data was already scraped and available in Kaggle was used.
+:::
+
+The data is from the professional scene as well as the normal (best) players and contains information about the players, teams, rounds, kills, deaths, etc.
+
+Also some general data about the game is available, such as the maps, the weapons, etc. 
+
+## Analysis
+
+## Learning Curve
+
+### Tools
+
+As mentioned in the description of the project, the tools used for this analysis should be Python and Jupyter Notebook. Nevertheless, the week before the **Rbootcamp** took place and we learnt about **RMarkdown** and **Knitr**, which produced a better looking document.
+
+The flexibility of Jupyter Notebook is great, but the final document is not as good looking as the one produced by **RMarkdown**. There is a bigger selesction of elements, themes and options that can make the document look better.
+
+Also, producing different types of documents is easier with **RMarkdown**. For example, producing a presentation, a pdf, a word document, a html document, etc. is easier as with Jupyter Notebook.
+
+#### Streamlit
+
+> [Streamlit](https://streamlit.io/) is a tool that allows to create web applications with Python. It is very easy to use and the final result is very good looking. It is a great tool to show the results of the analysis in a more interactive way.
+
+After hearing and checking Streamlit, I got really excited to learn how to use it and create a web application with the results of the analysis. 
+
+At least that was what I thought. Sadly there was some software problem that does not allow me to use Streamlit locally in my computer. I tried to solve it but I had not been able to, and after spending several hours trying to solve it, I decided to move on and use **Quarto**.
+
+Nevertheless, I managed to host the app in the cloud and was able to access it from there, but not seeing in "real time" the changes I was making and having to compile and push it to GitHub was not very productive.
+
+#### Quarto
+
+This is where **Quarto** comes in. Quarto is a new tool that is being developed by the same people that developed **RMarkdown** and **RStudio**. This tool is an improvement of RMarkdown and it is more flexible and powerful. Specially for different languages. While RMarkdown is focused on R, Quarto allows multiple languages including **Python**, R, Julia, etc. 
+
+## Discussions
+
+Being one of the few students that took the course online made it difficult to join a group and work online while the rest of the group was in the classroom.
+
+This lead to the decision of working alone, which was not a problem for me, but it would have been nice to work with someone else and share ideas and knowledge. On the other hand, working alone allowed me to work on this topic that I find interesting and allows me to work on it at my own pace.
+
+Team mates were replaced then by some friends and my partner, who game insight and feedback on the work and decisions made.

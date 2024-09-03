@@ -8,11 +8,14 @@ title-block-banner: orange
 title-block-banner-color: black
 toc: true
 toc-location: left
+toc-depth: 4
 number-sections: true
+number-sections-depth: 3
 format:
   html:
     code-fold: true
-    theme: darkly
+    theme: darkly 
+  pdf: default
 jupyter: python3
 ---
 
