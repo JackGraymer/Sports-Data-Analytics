@@ -1,6 +1,6 @@
 ---
 title: "Counter Strike 2"
-subtitle: "A simple Analysis of Esports Data"
+subtitle: "A simple Analysis of E-sports Data"
 author: "Alvaro Cervan"
 subject: "Sports Data Analysis"
 date: last-modified
@@ -18,6 +18,9 @@ format:
   pdf: default
 jupyter: python3
 ---
+
+# TODO
+- How are tournaments structured? (who plays against who)
 
 ## Introduction
 
@@ -191,7 +194,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
-from itables import show
+from plotly.subplots import make_subplots
+from itables import show, options as opt
+#opt.maxBytes = 0 # show all data in the table
 
 ```
 
@@ -206,9 +211,30 @@ pro_players = pd.read_csv('data/csgo_professional_players.csv')
 pro_games = pd.read_csv('data/csgo_professional_games.csv')
 ```
 
+```{python}
+# Cleaning the data: removing % and converting to float
+# Cleaning Weapons
+weapons["HS %"] = weapons["HS %"].str.replace("%", "").astype(float)
+weapons["Chest %"] = weapons["Chest %"].str.replace("%", "").astype(float)
+weapons["Leg %"] = weapons["Leg %"].str.replace("%", "").astype(float)
+weapons["Total Kills"] = weapons["Total Kills"].str.replace(",", "").astype(int)
+
+# Cleaning Maps
+maps["T-Win %"] = maps["T-Win %"].str.replace("%", "").astype(float)
+maps["CT-Win %"] = maps["CT-Win %"].str.replace("%", "").astype(float)
+maps["Play Rate"] = maps["Play Rate"].str.replace("%", "").astype(float)
+
+# Cleaning Pro Players
+pro_players["headshot_percentage"] = pro_players["headshot_percentage"].str.replace("%", "").astype(float)
+pro_players["team_win_percent_after_first_kill"] = pro_players["team_win_percent_after_first_kill"].str.replace("%", "").astype(float)
+pro_players["first_kill_in_won_rounds"] = pro_players["first_kill_in_won_rounds"].str.replace("%", "").astype(float)
+```
+
 ::: {.panel-tabset}
 
 ### Weapons
+
+The weapons_statistics dataset provides insights into weapon performance in CS:GO. Metrics include Kill Per Round (KPR), Headshot Percentage (HS %), Chest %, Leg %, and Total Kills. Weapons like AK-47, M4A1-S, and AWP are analyzed, offering valuable information for strategic gameplay. Weapon Statistics:
 
 ```{python}
 # Show weapons table
@@ -217,12 +243,16 @@ show(weapons)
 
 ### Players (Normal)
 
+The competitive_players_statistics dataset focuses on individual player performance in competitive CS:GO. Variables include Rank, Name, CS Rating, Region, Wins, Ties, and Losses. Notable players like sH0oRuk YouTube, TTpo100Razeb Daniel, and REZPEZT™ are featured, with their respective performance metrics.
+
 ```{python}
 # Show Top Normal Players table
 show(top_players)
 ```
 
 ### Maps
+
+The maps_statistics dataset offers detailed statistics on various CS:GO maps. Key metrics include Play Rate, T-Win %, CT-Win %, and the total number of Matches. Maps such as Dust II, Mirage, and Inferno are featured, showcasing their popularity and performance metrics.
 
 ```{python}
 # Show Maps table
@@ -231,6 +261,57 @@ show(maps)
 
 ### Players (Pro)
 
+The csgo_professional_players dataset provides comprehensive statistics on professional CS:GO players. Key metrics include Player ID, Nickname, Real Name, Age, Country, Current Team, Total Kills, Total Deaths, and Headshot Percentage. Notable players like s1mple, ZywOo, and device are featured, with their respective performance metrics.
+
+<details>
+<summary> Columns (41) </summary>
+
+| Column | Description   |
+|------|------------------------------------|
+| `player_id`                        | Player's ID on HLTV                                                |
+| `nickname`                         | In-game name of the player                                         |
+| `real_name`                        | Name of the player                                                 |
+| `age`                              | Age of the player                                                  |
+| `country`                          | Country of the player                                              |
+| `current_team`                     | Current team of the player                                         |
+| `teams`                            | All teams of the player, including previous and current teams      |
+| `total_kills`                      | Total in-game kills by the player                                  |
+| `total_deaths`                     | Total in-game deaths of the player                                 |
+| `headshot_percentage`              | Headshot percentage of the player                                  |
+| `damage_per_round`                 | Damage inflicted per round by the player                           |
+| `grenade_dmg_per_round`            | Damage inflicted per round with grenade by the player              |
+| `maps_played`                      | Total maps played by the player                                    |
+| `rounds_played`                    | Total rounds played by the player                                  |
+| `kills_per_death`                  | Kill(s) per death ratio of the player                              |
+| `kills_per_round`                  | Kill(s) per round ratio of the player                              |
+| `assists_per_round`                | Assists per round by the player                                    |
+| `deaths_per_round`                 | Deaths per round of the player                                     |
+| `saved_teammates_per_round`        | Average number of teammates saved per round by the player          |
+| `saved_by_teammate_per_round`      | Average number of times the player was saved by the teammates      |
+| `rounds_with_kills`                | Number of rounds in which the player got a kill                    |
+| `kill_to_death_diff`               | Kill-death difference                                              |
+| `total_opening_kills`              | Total number of opening kills by the player                        |
+| `total_opening_deaths`             | Total number of opening deaths of the player                       |
+| `opening_kill_ratio`               | Opening kill ratio of the player                                   |
+| `opening_kill_rating`              | Opening kill rating of the player                                  |
+| `team_win_percent_after_first_kill` | Win percentage of the team after first kill by the player          |
+| `first_kill_in_won_rounds`         | Percentage of rounds won in which the player got first kill        |
+| `0_kill_rounds`                    | Number of rounds with 0 kills by the player                        |
+| `1_kill_rounds`                    | Number of rounds with 1 kill by the player                         |
+| `2_kill_rounds`                    | Number of rounds with 2 kills by the player                        |
+| `3_kill_rounds`                    | Number of rounds with 3 kills by the player                        |
+| `4_kill_rounds`                    | Number of rounds with 4 kills by the player                        |
+| `5_kill_rounds`                    | Number of rounds with 5 kills by the player                        |
+| `rifle_kills`                      | Number of rifle kills by the player                                |
+| `sniper_kills`                     | Number of sniper kills by the player                               |
+| `smg_kills`                        | Number of SMG kills by the player                                  |
+| `pistol_kills`                     | Number of pistol kills by the player                               |
+| `grenade_kills`                    | Number of grenade kills by the player                              |
+| `other_kills`                      | Number of other weapon kills by the player                         |
+| `rating`                           | Rating of the player with 1.00 being the average                   |
+
+</details>
+
 ```{python}
 # Show Professional Players table
 show(pro_players)
@@ -238,11 +319,105 @@ show(pro_players)
 
 ### Pro Matches
 
+It is provided crucial information about the teams at the time of the match, such as the winner, team names, match score, head to head past victories and world ranks. Also, there is complete statistics from player1 to player5 of each competing team over a three-month period before the match day. Players are ordered from one to five inside their teams according to their rating(e.g. best rating would be the player1 and worse would be the player5).
+
+<details>
+<summary> Columns </summary>
+
+| Feature       | **Description**  |
+|----------|-----------------------------|
+| `world rank`                 | Team world rank at the match date according to hltv.org rank.                                                                                                      |
+| `points`                     | Number of points scored. It can be smaller than 5 if the match was a best of five game, e.g., t1_points = 3 and t2_points = 2, with t1 winning the match.           |
+| `h2h win perc`               | Float value from 0 to 1 representing share of wins on past games against the other team. Will be 0.5 if there are no previous confrontations.                       |
+| `player1 to player5 features`| Players are ordered from 1 to 5 according to their hltv.org rating (the best-rated player will always be considered player1).                                      |
+| `rating`                     | Main metric of player quality.                                                                                                                                     |
+| `impact`                     | Overall impact of the player on games (usually correlated with important and decisive kills).                                                                       |
+| `kdr`                        | Total number of kills / total number of deaths.                                                                                                                    |
+| `dmr`                        | Average damage per round.                                                                                                                                          |
+| `kpr`                        | Average number of kills per round.                                                                                                                                 |
+| `apr`                        | Average number of assists on teammates' kills per round.                                                                                                           |
+| `dpr`                        | Average number of deaths per round.                                                                                                                                |
+| `spr`                        | Average number of saved teammates per round.                                                                                                                       |
+| `opk ratio`                  | Total opening kills on rounds / total opening deaths on rounds.                                                                                                    |
+| `opk rating`                 | HLTV score on the player’s opening kills.                                                                                                                          |
+| `wins perc after fk`         | Round conversion rate when the player gets the first kill of the round.                                                                                            |
+| `fk perc in wins`            | Percentage of player first kills in won rounds.                                                                                                                    |
+| `multikill perc`             | Share of rounds where the player contributed with two or more kills.                                                                                               |
+| `rating at least one perc`   | Share of played matches where the player had at least 1.0 rating.                                                                                                  |
+| `is sniper`                  | Boolean indicating if the player has the "awp" (sniper) as their first or second weapon with the most kills.                                                       |
+| `clutch win perc`            | Conversion rate for the player in one vs. one situations.                                                                                                          |
+
+
+</details>
+
 ```{python}
 # Show Professional Matches table
 show(pro_games)
 ```
 :::
+
+## Analysis
+
+### Weapons Analysis
+
+#### Total Kills by Weapon
+
+```{python}
+#total kills by weapon
+fig = px.bar(weapons.sort_values(by='Total Kills', ascending=False), x='Weapon', y='Total Kills', title='Total Kills by Weapon', color='Weapon')
+fig.show()
+```
+
+The bar chart above shows the total kills by weapon. The AK-47 and M4A1-S are the most popular weapons, with the AWP and M4A1 being the next most popular. 
+AK-47 is the most popular weapon, doubling the second most popular weapon, the M4A1-S.
+
+::: {.callout-note}
+Weapon selection in CS2 are slightly different from Terrorist to Counter Terrorist. 
+
+Weapons like AK-47, Glock-18 or SG 553 are T only, while M4A1-S, AUG or USP-S are CT only
+:::
+
+This means that for AK-47 to have so many kills, knowing that in a match half of the players are CT and half T, even the CT will pick up and use an AK-47 and use it if the have the chance, making it the most popular weapon on the game.
+
+
+#### KPR (Kills per Round) by Weapon
+
+```{python}
+# KPR (Kills Per Round) by weapon
+fig = px.bar(weapons.sort_values(by='KPR', ascending=False), x='Weapon', y='KPR', title='Kills Per Round (KPR) by Weapon', color='Weapon')
+fig.show()
+```
+
+The figure above shows the average kills per round with each weapon. Here we can already start to think about **effectiveness** of a weapon (in the hands of the correct player). 
+
+In average, a player with a G3SG1 will kill 1.9 enemies, with AWP 1.6, AUG 1.3 and AK-47 1.2. This decimal numbers can be described as percentage of health of an enemy, so 1.9 is one kill and 90% of health of another player (or distributed among other players).
+
+::: {.callout-note}
+The first 2 weapons are sniper rifles and the third has a scope, so they are used for long range kills. The AK-47 is a rifle, used for medium range kills.
+:::
+
+#### Accuracy by Weapon
+
+On the next chart we can see the accuracy of each weapon. Here "*accuracy*" is the sum of the percentage of headshots, chest shots and leg shots. (Ordered Descending)
+
+```{python}
+# stacked bar chart with HS %, Chest % and Leg % using plotly Y = weapons
+fig = px.bar(weapons, x='Weapon', y=['HS %', 'Chest %', 'Leg %'], title='Headshot, Chest and Leg Percentage by Weapon', barmode='stack')
+fig.update_layout(barmode='stack', xaxis={'categoryorder':'total descending'})
+fig.show()
+```
+
+We can see that **accuracy** totals around 90% for all weapons, but when we look at the individual parts, these are not distributed equally. 
+
+- **Headshots:** Desert Eagle is the weapon with the highest headshot percentage, followed by USP-S and Famas. USP-S is a CT only weapon and it is given at the start of the round, so most CT players have it most of the time.
+Desert Eagle, on the other hand, is the most expensive pistol in the game, so it is used by players that are confident in their aim. 
+
+- **Chest:**Numbers are more evenly distributed around 60%, nevertheless, the AWP has the highest percentage, followed by 5 pistols. AWP is because is a one hit kill weapon, so players aim for the chest to guarantee the kill. For the pistols, they are used in close range where enemies are moving, so it is harder to aim for the head.
+
+- **Leg:** Numbers are similar to Headshots. Here we can see that the weapons with the highest leg percentage are SMGs and shotguns. These weapons are used in close range, where it is easier to hit the legs of the enemy. Also the spray pattern of these weapons is more random, so they tend to be aimed lower.
+
+### Maps Analysis
+
 
 ::: {.callout-note}
 ### Anotation 2
