@@ -14,13 +14,10 @@ number-sections-depth: 3
 format:
   html:
     code-fold: true
-    theme: darkly 
+    theme: darkly
   pdf: default
 jupyter: python3
 ---
-
-# TODO
-- How are tournaments structured? (who plays against who)
 
 ## Introduction
 
@@ -72,6 +69,23 @@ Every map is designed in a similar way. The CT appear near the designated areas 
 
 ![Mirage Map with Callouts](resources/de_mirage-map-callouts.jpg){#fig-map}
 
+#### Tournaments
+
+The same way that in football there FIFA World Cup or the UEFA Champions League, in CS2, tournaments are a vital part of the competitive e-sports scene, featuring both online leagues and LAN (Local Area Network) events held across various regions like Europe, North America, South America, and the CIS. These tournaments showcase the top teams from around the world competing for significant prize pools, which typically range from $500,000 to $2 million, depending on the event.
+
+The biggest CS2 tournaments are often the Majors, organized by Valve, considered the official world championships of the game. These events are held once or twice a year and feature the strongest teams from each region, making them the pinnacle of competitive CS2. These tournaments are also known for their high prize pools and the best teams competing for top honors.
+
+Some of the most popular CS2 tournaments in recent years include:
+
+- PGL Major – The Major is widely regarded as the most important event, drawing massive viewership and featuring intense competition.
+- IEM Cologne – Known for its rich history in the CS series, this tournament is one of the most anticipated events each year.
+- IEM Katowice – Another major international event with top-tier competition and a significant prize pool.
+- ESL Pro League – A highly competitive league featuring a series of tournaments throughout the year.
+- BLAST Premier – Known for its exciting format and high-quality production, it remains a fan favorite.
+
+These events are critical to determining the global rankings of teams and contribute to the overall growth of the CS2 e-sports community.
+
+The preferred competition format is the **best of 3** (Bo3), where the first team to win 2 maps wins the match, using Swiss System (16 teams minimum) or Double Elimination (8 teams minimum) formats.
 
 </details>
 
@@ -241,7 +255,7 @@ The weapons_statistics dataset provides insights into weapon performance in CS:G
 show(weapons)
 ```
 
-### Players (Normal)
+### Players (Casual)
 
 The competitive_players_statistics dataset focuses on individual player performance in competitive CS:GO. Variables include Rank, Name, CS Rating, Region, Wins, Ties, and Losses. Notable players like sH0oRuk YouTube, TTpo100Razeb Daniel, and REZPEZT™ are featured, with their respective performance metrics.
 
@@ -418,6 +432,54 @@ Desert Eagle, on the other hand, is the most expensive pistol in the game, so it
 
 ### Maps Analysis
 
+The next analysis about maps will show the win percentage of each side as well as the play rate of each map.
+
+#### Play Rate by Map
+
+```{python}
+# rewrite play rate using a different plot type
+fig = px.pie(maps, values='Play Rate', names='Map', title='Play Rate (%) by Map')
+fig.update_traces(textposition='inside', textinfo='value+label',texttemplate='%{value:.2f}%')
+# remove legend
+fig.update_layout(showlegend=False)
+# increase size
+fig.update_layout(height=500)
+# increase size of the plot relative the figure
+fig.update_layout(margin=dict(l=0, r=0, b=20))
+# increase font size of the text
+fig.update_layout(font_size=16)
+
+fig.show()
+
+```
+
+In the pie chart above we can see the play rate of each map. Dust II is the most popular map, followed by Mirage and Inferno. 
+
+Dust II is the most popular map in Counter Strike history, it is a simple map with 2 bomb sites and 3 main paths to reach them. It is a map that is easy to learn and play, so it is the most played map in the game. 
+
+This 3 maps compute more than 50% of the total play rate, so they are the most played maps in the game. The reason goes in 2 ways, they are the most played in the competitive scene and tournaments, so players want to practice them. Also, they are the most played in the casual scene, so players are more familiar with them. Which scene is the cause of this is hard to know, but it is a feedback loop that makes them the most played maps.
+
+#### Win Percentage by Map
+
+```{python}
+# win percentage by map
+fig = px.bar(maps, x='Map', y=['T-Win %', 'CT-Win %'], title='Win Percentage by Map', barmode='group')
+# category order by closest to 50% win rate
+fig.update_layout(xaxis={'categoryorder':'array', 'categoryarray':maps.sort_values(by='T-Win %', key=lambda x: abs(x-50))['Map']})
+# highlight the 50% win rate
+fig.add_hline(y=50, line_color="grey", line_dash="dot")
+# highlight maps (mirage, dust2 and inferno) dont use add_vrect
+fig.add_shape(type="rect", x0=-0.5, x1=2.5, y0=0, y1=100, fillcolor="rgba(255, 130, 0, 0.69)", layer="below", line_width=0)
+fig.show()
+```
+
+In the bar chart above we can see the win percentage of each side by map. The win rate is close to 50% for most maps, with the exception of Italy, with a unbalance of almost 16% in favor of the CT side.
+
+We also can see that the most played maps (Dust II, Mirage and Inferno) have a win rate close to 50%, so they are balanced maps. This is important in a competitive game, as it makes the game fair for both teams. This also matches with Italy, the most unbalanced map, being the least played map.
+
+The game also feeds back on this, as now maps are bundled in map packages, so players can choose to play one package, usually being the competitive one with the most balanced maps and the other packages with the less popular maps as shown in the chart.
+
+### Top Players (Casual) Analysis
 
 ::: {.callout-note}
 ### Anotation 2
