@@ -19,6 +19,10 @@ format:
 jupyter: python3
 ---
 
+# TODO
+
+- [ ] Check Casual players clustering colors to match the text
+
 ## Introduction
 
 This is a simple analysis of Counter Strike 2 data. The data was obtained from [Kaggle](https://www.kaggle.com/). The data includes information about weapons, players, maps, professional players, and professional games.
@@ -481,15 +485,171 @@ The game also feeds back on this, as now maps are bundled in map packages, so pl
 
 ### Top Players (Casual) Analysis
 
-::: {.callout-note}
-### Anotation 2
-Note that there are five types of callouts, including:
-`note`, `warning`, `important`, `tip`, and `caution`.
-```{markdown}
-::: {.callout-caution collapse="true"}
-## Expand To Learn About Collapse
+In this section we will analyze the top players by wins, losses and ties.
+The complete formula for how CS rates players is not public, but it is known that it takes into account the player's performance in the game, the player's team performance, and the player's opponents' performance, as well as the win or lose of the match.
+That means that even if the match is a tie or a loss, the player can still have a good CS rating if they performed well in the game.
 
-This is an example of a 'folded' caution callout that can be expanded by the user. You can use `collapse="true"` to collapse it by default or `collapse="false"` to make a collapsible callout that is expanded by default.
-:::
+Other miscellaneous things are taken into account, suck as the rank of other players, or if a player leaves the match giving disadvantage to a team or if a player flagged as a cheater.
+
+#### Top Players by Wins, Losses
+
+```{python}
+import plotly.graph_objects as go
+# top players by win, loses and ties using plotly in the same plot scatter
+fig = px.scatter(top_players, x='Wins', y='Losses', hover_name='Name', title='Top Players by CS Rating')
+# add a regression line to the plot
+abline = np.polyfit(top_players['Wins'], top_players['Losses'], 1)
+fig.add_traces(go.Scatter(x=top_players['Wins'], y=abline[0]*top_players['Wins']+abline[1], mode='lines', name='Correlation of Wins and Losses'))
+
+# legend on the top left
+fig.update_layout(legend=dict(x=0, y=1))
+fig.show()
+print(f"The correlation between Wins and Losses is {abline}, ")
+# interpret the regression line
 ```
+
+The scatter plot above shows the top players by wins and losses. The regression line shows a positive correlation between wins and losses, meaning that players with more wins tend to have more losses. This is expected, as the more games a player plays, the more likely they are to win and lose games. Also, the more wins a player has, the more likely they are to be matched against better players, increasing the chances of losing games.
+
+The result `[0.57897954, -20.36887699]` from the `np.polyfit` function represents a linear relationship between wins and losses for the top players:
+
+- **Slope (0.579)**: For each additional win, losses are predicted to increase by approximately 0.579. This suggests a moderately positive correlation between wins and losses, meaning as players win more, they tend to accumulate more losses as well.
+- **Intercept (-20.37)**: The model predicts about -20 losses when the number of wins is zero. While this doesn't make sense practically, it helps define the linear trend.
+
+The equation of the line would be:
+$$ \text{Losses} = 0.579 \times \text{Wins} - 20.37 $$
+
+In summary, the model indicates that as a player's number of wins increases, so do their losses at a fairly consistent rate.
+
+#### Cluster Map of Top Players by Wins and Losses
+
+```{python}
+# Cluster map of the top players by wins and losses using k-means clustering
+from sklearn.cluster import KMeans
+# create a new dataframe with only wins and losses
+top_players_wl = top_players[['Wins', 'Losses']].copy()
+# create a k-means clustering model with 3 clusters
+kmeans = KMeans(n_clusters=3)
+# fit the model to the data
+kmeans.fit(top_players_wl)
+# add the cluster labels to the dataframe
+top_players_wl['Cluster'] = kmeans.labels_
+# create a scatter plot of the data with the clusters colored
+fig = px.scatter(top_players_wl, x='Wins', y='Losses', color='Cluster', title='Top Players by Wins and Losses (Clustered)', color_continuous_scale='jet')
+fig.show()
+```
+
+The cluster map above shows the top players by wins and losses, clustered into three groups. The clusters are based on the players' performance in terms of wins and losses. The clustering algorithm groups players with similar win and loss patterns together, providing insights into player performance and behavior.
+
+This 3 groups could be interpreted as:
+
+- **Cluster 1 (Green)**: Players with low wins and almost 0 losses. These players are natural talents or experienced players with a new account. Probably play on a team of 5 players and have a good team.
+- **Cluster 0 (Blue)**: Players with a balanced number of wins and losses. These players are consistent performers who win and lose games at a similar rate. Likely play solo or with a team of 2 or 3 players.
+- **Cluster 2 (Red)**: Players with high wins and losses. These players are high-risk, high-reward players who play a lot and prioritize quantity over quality. Probably play solo a lot even if they have a team.
+
+::: {.callout-note}
+##### Importance of Playing Solo or With a Team
+Playing solo or with a team can affect the win rate of a player. Playing solo can be harder as the player has less control over the game because of playing with random players, while playing with a team can be easier as the player can coordinate with their teammates.
 :::
+
+### Professional Players Analysis
+
+The dataset of professional players contains comprehensive statistics on professional CS:GO players, including player ID, nickname, real name, age, country, current team, total kills, total deaths, headshot percentage, and more.
+
+#### Player Age Distribution
+
+```{python}
+# player age distribution
+fig = px.histogram(pro_players, x='age', title='Player Age Distribution', nbins=20)
+fig.show()
+```
+
+Here we can see the age distribution of professional players. The majority of players are in their mid-20s, with the peak age being around 24-25 years old. This is expected, as players in their mid-20s are typically at their peak performance in terms of reaction time and skill level.
+
+The distribution is slightly skewed to the right, with fewer players in their early 20s and stopping abruptly at the age of 17. This could be due to the age restrictions in professional CS:GO tournaments, where players under the age of 18 are not allowed to compete.
+
+On the other hand, there are slightly more players in their late 20s and early 30s, which could be due to the experience and maturity that comes with age. These players may have been playing CS:GO for a longer time and have more experience in competitive play.
+
+#### Player Country Map 
+
+```{python}
+# player country map
+pro_players['country_count'] = pro_players['country'].map(pro_players['country'].value_counts())
+fig = px.choropleth(pro_players, 
+                    locations='country', 
+                    locationmode='country names', 
+                    color='country_count', 
+                    title='Player Country Map', 
+                    color_continuous_scale='Viridis', 
+                    range_color=(0, pro_players['country_count'].max()))
+fig.show()
+```
+
+Here we have an interactive map of the count of professional players by country. The map shows the distribution of professional players around the world, with the United States, Russia, Sweden, Poland, Brazil and Australia being the countries with the most professional players. 
+Keeping in mind the total population, is remarkable how many players Sweden and Poland have in the professional scene.
+
+#### Kill-Death Ratio
+
+```{python}
+# key player metrics
+fig = px.scatter(pro_players, x='total_kills', y='total_deaths', title='Key Player Metrics')
+# add a regression line to the plot
+abline = np.polyfit(pro_players['total_kills'], pro_players['total_deaths'], 1)
+fig.add_traces(go.Scatter(x=pro_players['total_kills'], y=abline[0]*pro_players['total_kills']+abline[1], mode='lines', name='Kill-Death Ratio'))
+fig.show()
+print(f"The correlation between Total Kills and Total Deaths is {abline}, ")
+print(f"The average Kill-Death Ratio is {pro_players.kills_per_death.mean()}")
+```
+
+The scatter plot above shows the key player metrics of total kills and total deaths. The regression line shows a positive correlation between total kills and total deaths, meaning that players with more kills tend to have more deaths. This is expected, as the more kills a player gets, the more likely they are to die in the game.
+
+Furthermore, we can see a well defined line, meaning that the ratio of kills to deaths is consistent across all players in the professional scene. This is important, as it shows that players are playing at a similar level and are evenly matched in terms of skill and performance. 
+
+It could also infer that for a casual player to become a professional player, they need to have a good kill-death ratio, around **1.04**. Still other skills including team play, communication, strategy and experience are needed to become a professional player.
+
+#### Headshot Percentage and kill-death ratio
+
+```{python}
+# headshot percentage and kill-death ratio
+fig = px.scatter(pro_players, x='headshot_percentage', y='kills_per_death', title='Headshot Percentage and Kill-Death Ratio')
+fig.show()
+```
+
+```{python}
+# count and plot the appearance of each team in team and current team columns
+current_team_count = pro_players['current_team'].value_counts()
+# separate teams by commas, then count the number of teams
+teams = pro_players['teams'].str.split(',').explode().str.strip()
+teams_count = teams.value_counts()
+#sum both teams and current teams
+total_teams = current_team_count.add(teams_count, fill_value=0)
+# order teams by count
+total_teams = total_teams.sort_values(ascending=False)
+# plot the teams
+fig = px.bar(total_teams, title='Team Players', labels={'index':'Team', 'value':'Count'})
+fig.show()
+
+# plot top 10 teams
+fig = px.bar(total_teams.head(10), title='Top 10 Teams', labels={'index':'Team', 'value':'Count'})
+fig.show()
+```
+
+::: {.callout-note}
+This is a note callout.
+:::
+
+::: {.callout-warning}
+This is a warning callout.
+:::
+
+::: {.callout-important}
+This is an important callout.
+:::
+
+::: {.callout-tip}
+This is a tip callout.
+:::
+
+::: {.callout-caution}
+This is a caution callout.
+:::
+
