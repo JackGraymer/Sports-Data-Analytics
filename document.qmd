@@ -6,6 +6,7 @@ subject: "Sports Data Analysis"
 date: last-modified
 title-block-banner: orange
 title-block-banner-color: black
+lightbox: true
 toc: true
 toc-location: left
 toc-depth: 4
@@ -14,7 +15,9 @@ number-sections-depth: 3
 format:
   html:
     code-fold: true
-    theme: darkly
+    theme: 
+        light: flatly
+        dark: darkly
   pdf: default
 jupyter: python3
 ---
@@ -22,6 +25,7 @@ jupyter: python3
 # TODO
 
 - [ ] Check Casual players clustering colors to match the text
+- [ ] Add #| label: fig-polar and #| fig-cap: "A line plot on a polar axis" to all the plots
 
 ## Introduction
 
@@ -496,7 +500,7 @@ Other miscellaneous things are taken into account, suck as the rank of other pla
 ```{python}
 import plotly.graph_objects as go
 # top players by win, loses and ties using plotly in the same plot scatter
-fig = px.scatter(top_players, x='Wins', y='Losses', hover_name='Name', title='Top Players by CS Rating')
+fig = px.scatter(top_players, x='Wins', y='Losses', hover_name='Name', title='Top Players by Wins and Losses')
 # add a regression line to the plot
 abline = np.polyfit(top_players['Wins'], top_players['Losses'], 1)
 fig.add_traces(go.Scatter(x=top_players['Wins'], y=abline[0]*top_players['Wins']+abline[1], mode='lines', name='Correlation of Wins and Losses'))
@@ -611,8 +615,32 @@ It could also infer that for a casual player to become a professional player, th
 ```{python}
 # headshot percentage and kill-death ratio
 fig = px.scatter(pro_players, x='headshot_percentage', y='kills_per_death', title='Headshot Percentage and Kill-Death Ratio')
+# add a regression line to the plot
+abline = np.polyfit(pro_players['headshot_percentage'], pro_players['kills_per_death'], 1)
+fig.add_traces(go.Scatter(x=pro_players['headshot_percentage'], y=abline[0]*pro_players['headshot_percentage']+abline[1], mode='lines', name='Headshot Percentage and Kill-Death Ratio'))
+# move legend to below the plot
+fig.update_layout(legend=dict(yanchor="bottom", y=0.01, xanchor="left", x=0.01))
 fig.show()
 ```
+
+::: {.callout-note}
+##### Why Headshots?
+Headshots are important in CS2 because they deal more damage than body shots, and they are more likely to kill the enemy in one shot. This is important in a game where every shot counts, and players need to be accurate and precise to win.
+:::
+
+The scatter plot above shows the headshot percentage and kill-death ratio of professional players. The headshot percentage is the percentage of kills that are headshots, while the kill-death ratio is the total number of kills divided by the total number of deaths.
+
+The regression line shows a small negative correlation between headshot percentage and kill-death ratio, meaning that players with a higher headshot percentage tend to have a lower kill-death ratio. This is expected, as players who go for headshots are more likely to miss shots and die more often.
+
+```{python}
+# create a column called role and if sniper kills > rifle kills, then sniper, else rifle
+pro_players['role'] = np.where(pro_players['sniper_kills'] > pro_players['rifle_kills'], 'Sniper', 'Rifle')
+# add the role column as color for the scatter plot
+fig = px.scatter(pro_players, x='headshot_percentage', y='kills_per_death', color='role', title='Headshot Percentage and Kill-Death Ratio by Role')
+fig.show() 
+```
+
+Not only that, but sniper rifles inflict the highest damage, and kill in 2 shots to the body. Specially the AWP, which is a one shot kill weapon, players can then aim for any part of the body to kill the enemy, so aiming for the head, which is a smaller target and could be missed is not the best strategy. This could mean that most sniper players, which also tend to play more defensively and from distance, could have a higher kill-death ratio and a lower headshot percentage, while players that play more aggressively and with rifles could have a higher headshot percentage and a lower kill-death ratio.
 
 ```{python}
 # count and plot the appearance of each team in team and current team columns
