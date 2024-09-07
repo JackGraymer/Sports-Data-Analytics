@@ -526,7 +526,7 @@ from sklearn.cluster import KMeans
 # create a new dataframe with only wins and losses
 top_players_wl = top_players[['Wins', 'Losses']].copy()
 # create a k-means clustering model with 3 clusters
-kmeans = KMeans(n_clusters=3)
+kmeans = KMeans(n_clusters=3, random_state=0)
 # fit the model to the data
 kmeans.fit(top_players_wl)
 # add the cluster labels to the dataframe
@@ -540,9 +540,9 @@ The cluster map above shows the top players by wins and losses, clustered into t
 
 This 3 groups could be interpreted as:
 
-- **Cluster 1 (Green)**: Players with low wins and almost 0 losses. These players are natural talents or experienced players with a new account. Probably play on a team of 5 players and have a good team.
-- **Cluster 0 (Blue)**: Players with a balanced number of wins and losses. These players are consistent performers who win and lose games at a similar rate. Likely play solo or with a team of 2 or 3 players.
-- **Cluster 2 (Red)**: Players with high wins and losses. These players are high-risk, high-reward players who play a lot and prioritize quantity over quality. Probably play solo a lot even if they have a team.
+- **Cluster 0 (Blue)**: Players with low wins and almost 0 losses. These players are natural talents or experienced players with a new account. Probably play on a team of 5 players and have a good team.
+- **Cluster 1 (Green)**: Players with a balanced number of wins and losses. These players are consistent performers who win and lose games at a similar rate. Likely play solo or with a team of 2 or 3 players.
+- **Cluster 2 (Red)**: Players with high wins and losses. These players are high-risk, high-reward players who play a lot and prioritize quantity over quality. Probably play solo a lot even if they have a team. 
 
 ::: {.callout-note}
 ##### Importance of Playing Solo or With a Team
