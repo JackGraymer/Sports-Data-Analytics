@@ -16,6 +16,8 @@ format:
 jupyter: python3
 ---
 
+[Counter Strike 2 Analysis - link](https://jackgraymer.github.io/Sports-Data-Analytics/)
+
 ## Introduction
 
 The choice for this game comes as personal preference. I have been playing Counter Strike since I was a kid and I have always been interested in the competitive scene. When Global Offensive came out, I was already a fan of the game and a few friends and I started playing it. We started not being very good, but we got better and better, and reached some of the highest ranks in the game. 

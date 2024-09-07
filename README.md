@@ -1,5 +1,5 @@
 # Sports Data Analytics
-## Counter Strike 2 Data Analysis
+## Counter Strike 2 Data Analysis [link](https://jackgraymer.github.io/Sports-Data-Analytics/)
 
 This project is part of the Sports Data Analytics course at the Hochschule Luzern (HSLU) as part of the Masters in Data Science. The goal of this project is to analyze data from the a sport or e-sport of our choice. We chose to analyze data from the game Counter Strike 2 because of its popularity, availability of data and personal interest in the game.
 
