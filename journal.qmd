@@ -51,7 +51,25 @@ Also some general data about the game is available, such as the maps, the weapon
 
 ## Analysis
 
+The analysis is focused on the competitive scene (casual and professional players) and the data is used to answer some questions that could help improve the game or the players.
+
+The analysis took longer than expected, as some data wrangling was needed to get the data in the right format and some data cleaning was needed to remove some outliers and missing values.
+
+Also I wanted to spend more time on the professional players and tournament games data, but after doing some analysis on the normal players, weapons and maps, that was already quite a big analysis.
+
+About the tournament games and performance related to cheating scandals, I expected to find more information about it, but the data was not available or not enough to make a proper analysis. Also, as this game is very competitive and the players are very good, it is difficult to say if a player is cheating or not, so there is a lot of controversy and accusations against basically every player.
+
 ## Learning Curve
+
+This project was a great opportunity to learn new tools and techniques. The analysis was done in Python and Quarto, being the last one a new tool that I had never used before. 
+
+I am very happy with the results and the final document as it gives a very beautiful and professional look to the analysis. It is also very flexible and allows to produce different types of documents, such as pdf, html, word, etc.
+The choice for me is HTML, as it is the only one that supports the interactive plots and tables. Finally, the plethora of options and themes available make the document look very good.
+
+The only bad thing about Quarto is that it seems a bit heavier and in my not so powerful computer, it takes a bit longer to compile and render the document. Towards the end, for making final touches, rendering the new document could take a couple of minutes.
+This problem had a fix in Rmarkdown with the option to cache the chunks, but I could not find a similar option in Quarto.
+
+Finally, I tried to use Plotly for most of my plots and tables, as it is interactive and allows to zoom in, zoom out, hover, etc. This makes the document more interactive and the reader can explore the data in a more interactive way. The downside is that as an HTML element, it is not supported in the pdf or word documents.
 
 ### Tools
 
@@ -82,3 +100,22 @@ Being one of the few students that took the course online made it difficult to j
 This lead to the decision of working alone, which was not a problem for me, but it would have been nice to work with someone else and share ideas and knowledge. On the other hand, working alone allowed me to work on this topic that I find interesting and allows me to work on it at my own pace.
 
 Team mates were replaced then by some friends and my partner, who game insight and feedback on the work and decisions made.
+
+::: {.callout-warning}
+
+Please note that sections 1.1 and 1.2 have a drop down section that can be opened by clicking on it. This is a feature of Quarto that allows to hide some information, by default is hidden as it is an introduction to the game of itself, and is not indispensable for the analysis.
+:::
+
+::: {.callout-tip}
+
+On the top right of the HTML document, there is a button that allows to toggle the theme of the page from light to dark and vice versa. This is a feature of Quarto that allows to change the theme of the document to make it more comfortable for the reader.
+:::
+
+::: {.callout-important}
+### Post data
+While working on this project, on one of the breaks, I found about Mongolian throat singing and I got really interested in it. I started watching videos an songs and it is very fascinating.
+Here is my favorite:
+
+{{< video https://youtu.be/7mQ6z65K3KI?t=15 >}}
+
+:::
