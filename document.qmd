@@ -18,14 +18,8 @@ format:
     theme: 
         light: flatly
         dark: darkly
-  pdf: default
 jupyter: python3
 ---
-
-# TODO
-
-- [ ] Check Casual players clustering colors to match the text
-- [ ] Add #| label: fig-polar and #| fig-cap: "A line plot on a polar axis" to all the plots
 
 ## Introduction
 
@@ -642,6 +636,42 @@ fig.show()
 
 Not only that, but sniper rifles inflict the highest damage, and kill in 2 shots to the body. Specially the AWP, which is a one shot kill weapon, players can then aim for any part of the body to kill the enemy, so aiming for the head, which is a smaller target and could be missed is not the best strategy. This could mean that most sniper players, which also tend to play more defensively and from distance, could have a higher kill-death ratio and a lower headshot percentage, while players that play more aggressively and with rifles could have a higher headshot percentage and a lower kill-death ratio.
 
+#### KPI
+
+```{python}
+fig = go.Figure()
+
+# Headshot Percentage
+fig.add_trace(go.Indicator(
+    value=pro_players['headshot_percentage'].mean(),
+    title={"text": "Headshots % "},
+    domain = {'row': 0, 'column': 0}))
+
+# Kill-Death Ratio
+fig.add_trace(go.Indicator(
+    title = {"text": "Kill-Death Ratio"},
+    value = round(pro_players['kills_per_death'].mean(), 2),
+    domain = {'row': 0, 'column': 1}))
+
+# Damage per Round
+fig.add_trace(go.Indicator(
+    title = {"text": "Damage per Round"},
+    value = pro_players['damage_per_round'].mean(),
+    domain = {'row': 0, 'column': 2}))
+
+fig.update_layout(
+    grid = {'rows': 1, 'columns': 3, 'pattern': "independent"},
+    template = {'data' : {'indicator': [{
+        'title': {'text': "KPI"},
+        'mode' : "number",
+
+        }]
+                         }})
+
+```
+
+#### Professional Players by Team
+
 ```{python}
 # count and plot the appearance of each team in team and current team columns
 current_team_count = pro_players['current_team'].value_counts()
@@ -657,27 +687,288 @@ fig = px.bar(total_teams, title='Team Players', labels={'index':'Team', 'value':
 fig.show()
 
 # plot top 10 teams
-fig = px.bar(total_teams.head(10), title='Top 10 Teams', labels={'index':'Team', 'value':'Count'})
+fig = px.bar(total_teams.head(10), title='Top 10 Teams', labels={'index':'Team'})
 fig.show()
 ```
 
-::: {.callout-note}
-This is a note callout.
-:::
+In the bar chart above we can see the distribution of professional players by team. The second done is zoomed in the top 10 teams. This includes from the current and previous teams of the players, this way it shows a broader view of which teams have more movement of players.
 
-::: {.callout-warning}
-This is a warning callout.
-:::
+In the next chapter we can see if this teams are the most successful in the professional scene, meaning that their movement in players is motivated by the improvement of the team, or on the other hand, if the movement is due to the team not being successful and players leaving to find a better team.
 
-::: {.callout-important}
-This is an important callout.
-:::
+### Professional Matches Analysis
 
-::: {.callout-tip}
-This is a tip callout.
-:::
+The dataset of professional matches contains crucial information about the teams at the time of the match, such as the winner, team names, match score, head-to-head past victories, and world ranks. It also includes complete statistics from player1 to player5 of each competing team.
 
-::: {.callout-caution}
-This is a caution callout.
-:::
+#### Team World Rank Over Time
+```{python}
+# Convert match_date to datetime
+pro_games['match_date'] = pd.to_datetime(pro_games['match_date'])
+
+# Create a list of all teams and their corresponding world ranks
+team_data = []
+for _, row in pro_games.iterrows():
+    team_data.append({'date': row['match_date'], 'team': row['team_1'], 'rank': row['t1_world_rank']})
+    team_data.append({'date': row['match_date'], 'team': row['team_2'], 'rank': row['t2_world_rank']})
+
+# Convert to DataFrame and sort
+team_df = pd.DataFrame(team_data).sort_values('date')
+
+# Get unique teams
+teams = sorted(team_df['team'].unique())
+
+# Create a color map for teams
+color_scale = px.colors.qualitative.Plotly
+color_map = {team: color_scale[i % len(color_scale)] for i, team in enumerate(teams)}
+
+# Create figure
+fig = go.Figure()
+
+# Filter teams with at least 30 data points
+team_counts = team_df['team'].value_counts()
+teams = team_counts[team_counts >= 30].index
+
+
+# Add traces for each team
+for team in teams:
+    team_ranks = team_df[team_df['team'] == team]
+    fig.add_trace(go.Scatter(
+        x=team_ranks['date'],
+        y=team_ranks['rank'],
+        mode='lines+markers',
+        name=team,
+        line=dict(color=color_map[team]),
+        marker=dict(size=8),
+        visible=False  # Set all traces as initially invisible
+    ))
+
+# Make the first team visible initially
+fig.data[0].visible = True
+
+# Create and add dropdown menu
+dropdown_buttons = []
+for team in teams:
+    button = dict(
+        method='update',
+        label=team,
+        args=[{'visible': [team in trace.name for trace in fig.data]},
+              {'title': f'{team} - Team World Rank Over Time'}]
+    )
+    dropdown_buttons.append(button)
+
+# Update layout
+fig.update_layout(
+    title=f'{teams[0]} - Team World Rank Over Time',
+    xaxis_title='Month',
+    yaxis_title='Ranking',
+    yaxis=dict(autorange="reversed"),  # Reversed Y-axis
+    legend_title='Year',
+    hovermode='x unified',
+    updatemenus=[dict(
+        active=0,
+        buttons=dropdown_buttons,
+        x=0.95,
+        y=0.99,
+        xanchor='right',
+        yanchor='top'
+    )],
+    legend=dict(
+        orientation="h",  # Horizontal orientation
+        yanchor="bottom",
+        y=-0.2,  # Positioned below the plot
+        xanchor="center",
+        x=0.5,
+        bgcolor="rgba(255, 255, 255, 0.5)",
+    ),
+    margin=dict(r=20, t=40, b=100, l=60)  # Increased bottom margin for legend
+)
+
+# Show the plot
+fig.show()
+
+```
+
+The interactive plot above shows the world rank of professional teams over time. The plot allows you to select a team from the dropdown menu and see how their world rank has changed over time. 
+
+#### Win Percentage Over Time
+
+```{python}
+# Create a function to calculate win percentage
+def calculate_win_percentage(team_data):
+    team_data['wins'] = (
+        ((team_data['team_1'] == team_data['team']) & (team_data['winner'] == 't1')) | 
+        ((team_data['team_2'] == team_data['team']) & (team_data['winner'] == 't2'))
+    )
+    team_data['cumulative_wins'] = team_data['wins'].cumsum()
+    team_data['matches_played'] = range(1, len(team_data) + 1)
+    team_data['win_percentage'] = team_data['cumulative_wins'] / team_data['matches_played'] * 100
+    return team_data
+
+# Create figure
+fig = go.Figure()
+
+# Add traces for each team and year
+for team in teams:
+    team_data = pro_games[(pro_games['team_1'] == team) | (pro_games['team_2'] == team)].copy()
+    team_data['team'] = team  # Add this line to define 'team' column
+    team_data = calculate_win_percentage(team_data)
+    
+    for year in range(2016, 2021):
+        year_data = team_data[team_data['match_date'].dt.year == year]
+        if not year_data.empty:
+            fig.add_trace(go.Scatter(
+                x=year_data['match_date'].dt.strftime('%b'),
+                y=year_data['win_percentage'],
+                mode='lines',
+                name=f'{team} - {year}',
+                visible=False if team != teams[0] else True,
+                line=dict(width=2)
+            ))
+
+# Create and add dropdown menu
+dropdown_buttons = []
+for team in teams:
+    button = dict(
+        method='update',
+        label=team,
+        args=[{'visible': [team in trace.name for trace in fig.data]},
+              {'title': f'{team} - Win Percentage Over Time'}]
+    )
+    dropdown_buttons.append(button)
+
+fig.update_layout(
+    updatemenus=[dict(
+        active=0,
+        buttons=dropdown_buttons,
+        x=1.05,
+        y=0.8,
+        xanchor='left',
+        yanchor='top'
+    )]
+)
+
+# Update layout
+fig.update_layout(
+    title=f'{teams[0]} - Win Percentage Over Time',
+    xaxis_title='Month',
+    yaxis_title='% Won / Matches Played',
+    yaxis=dict(range=[0, 100]),
+    legend_title='Year',
+    hovermode='x unified',
+    updatemenus=[dict(
+        active=0,
+        buttons=dropdown_buttons,
+        x=0.95,
+        y=0.99,
+        xanchor='right',
+        yanchor='top'
+    )],
+    legend=dict(
+        orientation="h",  # Horizontal orientation
+        yanchor="bottom",
+        y=-0.2,  # Positioned below the plot
+        xanchor="center",
+        x=0.5,
+        bgcolor="rgba(255, 255, 255, 0.5)",
+    ),
+    margin=dict(r=20, t=40, b=100, l=60)  # Increased bottom margin for legend
+)
+
+
+# Show the plot
+fig.show()
+```
+
+The interactive plot above lets you explore the win percentage of professional teams over time. You can select a team from the dropdown menu to see how their win percentage has changed over the years. The plot shows the win percentage for each month of the year, allowing you to see trends and patterns in the team's performance.
+
+For most teams, the win percentage is mostly stable over time, with some fluctuations depending on the year. This could be due to changes in the team roster, coaching staff, or other factors that affect team performance. Some teams show a clear upward or downward trend in their win percentage, indicating a change in performance over time.
+
+#### Professional Players Performance Over Time
+
+This are some KPI that could be analyzed over time, like the total points, average KDR and average multikill percentage. This data could be used to analyze the performance of professional players over time and identify trends and patterns in their performance.
+
+This indicators in tournaments should be similar to the ones of the professional players in the previous section, which contain both tournament and practice matches. This could be used to see if the players perform better in tournaments or in practice matches.
+
+##### Rounds Played
+```{python}
+pro_games = pro_games.sort_values('match_date')
+
+def create_timeseries(df, x, y, title, y_title):
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=df[x], y=df[y], mode='lines+markers'))
+    fig.update_layout(title=title, xaxis_title='Date', yaxis_title=y_title)
+    return fig
+
+# 2. Total Rounds per match over time
+pro_games['total_points'] = pro_games['t1_points'] + pro_games['t2_points']
+fig2 = create_timeseries(pro_games, 'match_date', 'total_points', 
+                         'Total Rounds Played', 'Total Rounds')
+fig2.show()
+```
+
+Here we can see the total rounds played in professional matches over time. The number of rounds played in a match can vary depending on the format of the match (best of 1, best of 3, etc.) and the skill level of the teams. The average number of rounds played in a professional match is around 25-30, with some matches going up to 40 rounds or more. 
+
+Some might be exceptionally short if one team dominates the other or unexpected events happen, like a player disconnecting or a team forfeiting the match.
+
+##### Average KDR (Kill/Death Ratio) Over Time
+
+```{python}
+# 3. Average KDR (Kill/Death Ratio) over time
+pro_games['avg_kdr'] = pro_games[[f't1_player{i}_kdr' for i in range(1, 6)] + 
+                                 [f't2_player{i}_kdr' for i in range(1, 6)]].mean(axis=1)
+fig3 = create_timeseries(pro_games, 'match_date', 'avg_kdr', 
+                         'Average Kill/Death Ratio Over Time', 'Average KDR')
+fig3.show()
+# average kdr over time
+print(pro_games['avg_kdr'].mean())
+```
+
+This plot shows the average kill-death ratio of professional players over time. Stays very stable in the 4 years that are shown. The value is 1.07, slightly above the average kill-death ratio of 1.04 that we saw earlier. 
+
+##### Average Multikill Percentage Over Time
+
+```{python}
+# 4. Average Multikill Percentage over time
+pro_games['avg_multikill_perc'] = pro_games[[f't1_player{i}_multikill_perc' for i in range(1, 6)] + 
+                                            [f't2_player{i}_multikill_perc' for i in range(1, 6)]].mean(axis=1)
+fig4 = create_timeseries(pro_games, 'match_date', 'avg_multikill_perc', 
+                         'Average Multikill Percentage Over Time', 'Average Multikill %')
+
+print(pro_games['avg_multikill_perc'].mean())
+
+fig4.show()
+```
+
+This plot shows the average multikill percentage of professional players over time. The multikill percentage is the percentage of rounds where a player gets two or more kills. The average multikill percentage is around 17%, meaning that players get two or more kills in about 1 out of 5 rounds. This also means that basically every round, there is a chance that atleast one of the team members makes a multi kill. This is an important metric in CS:GO, as multikills can swing the momentum of a game and give a team a significant advantage. 
+
+## Cheating in Counter Strike
+
+{{< video https://www.youtube.com/embed/sA2P8jq94tE >}}
+
+### VAC (Valve Anti-Cheat)
+
+VAC is an anti-cheat software developed by Valve Corporation. It is used in games like Counter-Strike to detect and ban players who are using cheats or hacks to gain an unfair advantage. VAC works by scanning a player's computer for known cheat software and banning them if any is found.
+
+Nevertheless, VAC is not perfect and there are ways to bypass it. Some cheats are designed to be undetectable by VAC. It is an arms race between cheat developers and anti-cheat software developers, with each side trying to outsmart the other.
+
+### Simple Understanding of Cheating
+
+Cheating in Counter-Strike can take many forms, from aimbots that automatically aim at enemies to wallhacks that allow players to see through walls. Other cheats include triggerbots that automatically shoot when an enemy is in the crosshair, and bunnyhopping scripts that allow players to move faster than normal.
+
+All of this is possible because the game has the information about all players, including their position, health, and weapons, on the client side. This means that players can modify the game files to gain an advantage over others. It is just a matter of time until a cheat developer finds a way to use this data to create a cheat that is undetectable by VAC. Then, it is up to VAC to detect and ban these cheat software and players using it.
+
+### Impact of Cheating
+
+Cheating in Counter-Strike has a negative impact on the game and the community. It ruins the competitive integrity of the game, making it unfair for players who are playing legitimately. It also creates a toxic environment where players are constantly accusing each other of cheating and reporting suspicious behavior.
+
+The game implements a voting system where players can vote to kick a player from the game if they suspect them of cheating. This is a way for the community to police itself and remove cheaters from the game. However, this system is not foolproof and can be abused by players who want to kick others for no reason.
+
+Also it features a report system, where players can report other players for cheating, griefing, or other violations of the game's rules. This system is used to gather data on suspicious players and take action against them if necessary. If enough reports are received, the player will be investigated and banned if found to be cheating or acting inappropriately.
+
+## Conclusion
+
+Counter-Strike: Global Offensive is a popular first-person shooter game that has a large and dedicated player base. The game has a competitive scene with professional players and teams competing in tournaments around the world. The game has a rich history and a strong community that continues to support it.
+
+In this analysis, we explored various aspects of the game, including weapons analysis, maps analysis, top players analysis, and professional players analysis. We looked at key metrics such as total kills, KPR, accuracy, play rate, win percentage, and more. We also analyzed the performance of professional players over time and looked at the impact of cheating in the game.
+
+Counter-Strike: Global Offensive is a complex and competitive game that requires skill, strategy, and teamwork to succeed. The game has a dedicated community of players who continue to support it and keep it alive. It is a game that has stood the test of time and remains one of the most popular first-person shooters in the world.
 
